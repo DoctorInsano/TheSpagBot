@@ -1,0 +1,18 @@
+{
+    "Host": "irc.chat.twitch.tv",
+    "Port": 6667,
+    "Channel": "#xTwoShoes",
+    "Nickname": "thespagbot",
+    "Authentication": "YOUR_OAUTH_TOKEN_HERE",
+    "DeniedUsers": [
+        "StreamElements",
+        "Nightbot",
+        "Moobot",
+        "Marbiebot"
+    ],
+    "Cooldown": 1,
+    "KeyLength": 2,
+    "MaxSentenceWordAmount": 30,
+    "HelpMessageTimer": 7200,
+    "AutomaticGenerationTimer": 300
+}
