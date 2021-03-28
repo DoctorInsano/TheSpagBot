@@ -1,5 +1,5 @@
 # TwitchMarkovChain
-Twitch Bot for generating messages based on what it learned from chat 
+Custom twitch bot for the xTwoShoes channel. Forked from TwitchMarkovChain
 
 ---
 # Explanation
