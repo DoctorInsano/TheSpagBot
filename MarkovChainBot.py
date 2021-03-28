@@ -96,23 +96,24 @@ class MarkovChain:
                 # If it is not, log this NOTICE
                 else:
                     logger.info(m.message)
+                #self.ws.send_message("SPAGBOT started. I am here for the SPAGET.")
 
             elif m.type in ("PRIVMSG", "WHISPER"):
-                if m.message.startswith("!enable") and self.check_if_streamer(m):
+                if m.message.startswith("!enable") and (self.check_if_streamer(m) or self.check_if_mod(m)):
                     if self._enabled:
                         self.ws.send_whisper(m.user, "The !generate is already enabled.")
                     else:
                         self.ws.send_whisper(m.user, "Users can now !generate message again.")
                         self._enabled = True
 
-                elif m.message.startswith("!disable") and self.check_if_streamer(m):
+                elif m.message.startswith("!disable") and (self.check_if_streamer(m) or self.check_if_mod(m)):
                     if self._enabled:
                         self.ws.send_whisper(m.user, "Users can now no longer use !generate.")
                         self._enabled = False
                     else:
                         self.ws.send_whisper(m.user, "The !generate is already disabled.")
 
-                elif m.message.startswith(("!setcooldown", "!setcd")) and self.check_if_streamer(m):
+                elif m.message.startswith(("!setcooldown", "!setcd")) and (self.check_if_streamer(m) or self.check_if_mod(m)):
                     split_message = m.message.split(" ")
                     if len(split_message) == 2:
                         try:
@@ -139,7 +140,7 @@ class MarkovChain:
                         return
 
                     cur_time = time.time()
-                    if self.prev_message_t + self.cooldown < cur_time or self.check_if_streamer(m):
+                    if self.prev_message_t + self.cooldown < cur_time or self.check_if_streamer(m) or self.check_if_mod(m):
                         if self.check_filter(m.message):
                             sentence = "You can't make me say that, you madman!"
                         else:
@@ -438,6 +439,9 @@ class MarkovChain:
     def check_link(self, message) -> bool:
         # True if message contains a link
         return self.link_regex.search(message)
+    
+    def check_if_mod(self, m) -> bool:
+        return m.user in self.mod_list
 
 if __name__ == "__main__":
     MarkovChain()
