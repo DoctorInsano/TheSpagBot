@@ -101,17 +101,17 @@ class MarkovChain:
             elif m.type in ("PRIVMSG", "WHISPER"):
                 if m.message.startswith("!enable") and (self.check_if_streamer(m) or self.check_if_mod(m)):
                     if self._enabled:
-                        self.ws.send_message(m.user, "The !generate is already enabled.")
+                        self.ws.send_message("The !generate is already enabled.")
                     else:
-                        self.ws.send_message(m.user, "Users can now !generate message again.")
+                        self.ws.send_message("Users can now !generate message again.")
                         self._enabled = True
 
                 elif m.message.startswith("!disable") and (self.check_if_streamer(m) or self.check_if_mod(m)):
                     if self._enabled:
-                        self.ws.send_message(m.user, "Users can now no longer use !generate.")
+                        self.ws.send_message("Users can now no longer use !generate.")
                         self._enabled = False
                     else:
-                        self.ws.send_message(m.user, "The !generate is already disabled.")
+                        self.ws.send_message("The !generate is already disabled.")
 
                 elif m.message.startswith(("!setcooldown", "!setcd")) and (self.check_if_streamer(m) or self.check_if_mod(m)):
                     split_message = m.message.split(" ")
@@ -119,13 +119,13 @@ class MarkovChain:
                         try:
                             cooldown = int(split_message[1])
                         except ValueError:
-                            self.ws.send_message(m.user, f"The parameter must be an integer amount, eg: !setcd 30")
+                            self.ws.send_message(f"The parameter must be an integer amount, eg: !setcd 30")
                             return
                         self.cooldown = cooldown
                         Settings.update_cooldown(cooldown)
-                        self.ws.send_message(m.user, f"The !generate cooldown has been set to {cooldown} seconds.")
+                        self.ws.send_message(f"The !generate cooldown has been set to {cooldown} seconds.")
                     else:
-                        self.ws.send_message(m.user, f"Please add exactly 1 integer parameter, eg: !setcd 30.")
+                        self.ws.send_message(f"Please add exactly 1 integer parameter, eg: !setcd 30.")
 
             if m.type == "PRIVMSG":
 
