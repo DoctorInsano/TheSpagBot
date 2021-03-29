@@ -39,7 +39,7 @@ class MarkovChain:
         if self.settings.automatic_generation_timer > 0:
             if self.settings.automatic_generation_timer < 30:
                 raise ValueError("Value for \"AutomaticGenerationMessage\" in must be at least 30 seconds, or a negative number for no automatic generations.")
-            t = LoopingTimer(self.settings.automatic_generation_timer, self.settings.send_automatic_generation_message)
+            t = LoopingTimer(self.settings.automatic_generation_timer, self.send_automatic_generation_message)
             t.start()
 
         self.ws = TwitchWebsocket(host=self.settings.host, 

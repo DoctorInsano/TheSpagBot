@@ -118,7 +118,7 @@ The use of this command makes the bot post this message in chat:
 <pre><b>Learn how this bot generates sentences here: https://github.com/CubieDev/TwitchMarkovChain#how-it-works</b></pre>
 
 ---
-## Streamer commands
+## Streamer and Moderator commands
 All of these commands can be whispered to the bot account, or typed in chat.<br>
 To disable the bot from generating messages, while still learning from regular chat messages:
 <pre><b>!disable</b></pre>
@@ -132,7 +132,7 @@ Example:
 Which sets the cooldown between generations to 30 seconds.
 
 ---
-## Moderator commands
+## Whispered Streamer and Moderator commands
 All of these commands must be whispered to the bot account.<br>
 Moderators (and the broadcaster) can modify the blacklist to prevent the bot learning words it shouldn't.<br>
 To add `word` to the blacklist, a moderator can whisper the bot:
