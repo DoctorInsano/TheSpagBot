@@ -1,5 +1,5 @@
 # TwitchMarkovChain
-Custom twitch bot for the xTwoShoes channel. Forked from TwitchMarkovChain
+Custom twitch bot for the xTwoShoes channel. Forked from [tomaarsen's TwitchMarkovChain](https://github.com/tomaarsen/TwitchMarkovChain)
 
 ---
 # Explanation
@@ -198,7 +198,7 @@ Words can also be added or removed from the blacklist via whispers, as is descri
 * [Module requirements](requirements.txt)<br>
 Install these modules using `pip install -r requirements.txt` in the commandline.
 
-Among these modules is my own [TwitchWebsocket](https://github.com/tomaarsen/TwitchWebsocket) wrapper, which makes making a Twitch chat bot a lot easier.
+Among these modules is tomaarsen's [TwitchWebsocket](https://github.com/tomaarsen/TwitchWebsocket) wrapper, which makes making a Twitch chat bot a lot easier.
 This repository can be seen as an implementation using this wrapper.
 
 ---
