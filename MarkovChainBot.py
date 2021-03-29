@@ -14,17 +14,6 @@ logger = logging.getLogger(__name__)
 
 class MarkovChain:
     def __init__(self):
-        self.host = None
-        self.port = None
-        self.chan = None
-        self.nick = None
-        self.auth = None
-        self.denied_users = None
-        self.cooldown = 20
-        self.key_length = 2
-        self.max_sentence_length = 20
-        self.help_message_timer = 7200
-        self.automatic_generation_timer = -1
         self.prev_message_t = 0
         self._enabled = True
         # This regex should detect similar phrases as links as Twitch does
@@ -36,45 +25,34 @@ class MarkovChain:
         self.set_blacklist()
 
         # Fill previously initialised variables with data from the settings.txt file
-        Settings(self)
-        self.db = Database(self.chan)
+        self.settings = Settings(self)
+        self.db = Database(self.settings.channel)
 
         # Set up daemon Timer to send help messages
-        if self.help_message_timer > 0:
-            if self.help_message_timer < 300:
+        if self.settings.help_message_timer > 0:
+            if self.settings.help_message_timer < 300:
                 raise ValueError("Value for \"HelpMessageTimer\" in must be at least 300 seconds, or a negative number for no help messages.")
-            t = LoopingTimer(self.help_message_timer, self.send_help_message)
+            t = LoopingTimer(self.settings.help_message_timer, self.send_help_message)
             t.start()
         
         # Set up daemon Timer to send automatic generation messages
-        if self.automatic_generation_timer > 0:
-            if self.automatic_generation_timer < 30:
+        if self.settings.automatic_generation_timer > 0:
+            if self.settings.automatic_generation_timer < 30:
                 raise ValueError("Value for \"AutomaticGenerationMessage\" in must be at least 30 seconds, or a negative number for no automatic generations.")
-            t = LoopingTimer(self.automatic_generation_timer, self.send_automatic_generation_message)
+            t = LoopingTimer(self.settings.automatic_generation_timer, self.settings.send_automatic_generation_message)
             t.start()
 
-        self.ws = TwitchWebsocket(host=self.host, 
-                                  port=self.port,
-                                  chan=self.chan,
-                                  nick=self.nick,
-                                  auth=self.auth,
+        self.ws = TwitchWebsocket(host=self.settings.host, 
+                                  port=self.settings.port,
+                                  chan=self.settings.channel,
+                                  nick=self.settings.nickname,
+                                  auth=self.settings.authentication,
                                   callback=self.message_handler,
                                   capability=["commands", "tags"],
                                   live=True)
+    
+    def start_bot(self):
         self.ws.start_bot()
-
-    def set_settings(self, host, port, chan, nick, auth, denied_users, cooldown, key_length, max_sentence_length, help_message_timer, automatic_generation_timer):
-        self.host = host
-        self.port = port
-        self.chan = chan
-        self.nick = nick
-        self.auth = auth
-        self.denied_users = [user.lower() for user in denied_users] + [self.nick.lower()]
-        self.cooldown = cooldown
-        self.key_length = key_length
-        self.max_sentence_length = max_sentence_length
-        self.help_message_timer = help_message_timer
-        self.automatic_generation_timer = automatic_generation_timer
 
     def message_handler(self, m):
         try:
@@ -121,7 +99,7 @@ class MarkovChain:
                         except ValueError:
                             self.ws.send_message(f"The parameter must be an integer amount, eg: !setcd 30")
                             return
-                        self.cooldown = cooldown
+                        self.settings.cooldown = cooldown
                         Settings.update_cooldown(cooldown)
                         self.ws.send_message(f"The !generate cooldown has been set to {cooldown} seconds.")
                     else:
@@ -130,7 +108,7 @@ class MarkovChain:
             if m.type == "PRIVMSG":
 
                 # Ignore bot messages
-                if m.user.lower() in self.denied_users:
+                if m.user.lower() in self.settings.denied_users:
                     return
                 
                 if self.check_if_generate(m.message):
@@ -140,7 +118,7 @@ class MarkovChain:
                         return
 
                     cur_time = time.time()
-                    if self.prev_message_t + self.cooldown < cur_time or self.check_if_streamer(m) or self.check_if_mod(m):
+                    if self.prev_message_t + self.settings.cooldown < cur_time or self.check_if_streamer(m) or self.check_if_mod(m):
                         if self.check_filter(m.message):
                             sentence = "You can't make me say that, you madman!"
                         else:
@@ -154,8 +132,8 @@ class MarkovChain:
                         self.ws.send_message(sentence)
                     else:
                         if not self.db.check_whisper_ignore(m.user):
-                            self.ws.send_whisper(m.user, f"Cooldown hit: {self.prev_message_t + self.cooldown - cur_time:0.2f} out of {self.cooldown:.0f}s remaining. !nopm to stop these cooldown pm's.")
-                        logger.info(f"Cooldown hit with {self.prev_message_t + self.cooldown - cur_time:0.2f}s remaining")
+                            self.ws.send_whisper(m.user, f"Cooldown hit: {self.prev_message_t + self.settings.cooldown - cur_time:0.2f} out of {self.settings.cooldown:.0f}s remaining. !nopm to stop these cooldown pm's.")
+                        logger.info(f"Cooldown hit with {self.prev_message_t + self.settings.cooldown - cur_time:0.2f}s remaining")
                     return
                 
                 # Send help message when requested.
@@ -203,18 +181,18 @@ class MarkovChain:
                         words = sentence.split(" ")
                         
                         # If the sentence is too short, ignore it and move on to the next.
-                        if len(words) <= self.key_length:
+                        if len(words) <= self.settings.key_length:
                             continue
                         
                         # Add a new starting point for a sentence to the <START>
-                        #self.db.add_rule(["<START>"] + [words[x] for x in range(self.key_length)])
-                        self.db.add_start_queue([words[x] for x in range(self.key_length)])
+                        #self.db.add_rule(["<START>"] + [words[x] for x in range(self.settings.key_length)])
+                        self.db.add_start_queue([words[x] for x in range(self.settings.key_length)])
                         
                         # Create Key variable which will be used as a key in the Dictionary for the grammar
                         key = list()
                         for word in words:
                             # Set up key for first use
-                            if len(key) < self.key_length:
+                            if len(key) < self.settings.key_length:
                                 key.append(word)
                                 continue
                             
@@ -303,9 +281,9 @@ class MarkovChain:
 
         # Get the starting key and starting sentence.
         # If there is more than 1 param, get the last 2 as the key.
-        # Note that self.key_length is fixed to 2 in this implementation
+        # Note that self.settings.key_length is fixed to 2 in this implementation
         if len(params) > 1:
-            key = params[-self.key_length:]
+            key = params[-self.settings.key_length:]
             # Copy the entire params for the sentence
             sentence = params.copy()
 
@@ -331,7 +309,7 @@ class MarkovChain:
                 # If nothing's ever been said
                 return "There is not enough learned information yet.", False
         
-        for i in range(self.max_sentence_length - self.key_length):
+        for i in range(self.settings.max_sentence_length - self.settings.key_length):
             # Use key to get next word
             if i == 0:
                 # Prevent fetching <END> on the first go
@@ -354,7 +332,7 @@ class MarkovChain:
         # Then the params did not result in an actual sentence
         # If so, restart without params
         if len(params) > 0 and params == sentence:
-            return "I haven't yet learned what to do with \"" + " ".join(params[-self.key_length:]) + "\"", False
+            return "I haven't yet learned what to do with \"" + " ".join(params[-self.settings.key_length:]) + "\"", False
 
         return " ".join(sentence), True
 
@@ -444,4 +422,5 @@ class MarkovChain:
         return m.user in self.mod_list
 
 if __name__ == "__main__":
-    MarkovChain()
+    bot = MarkovChain()
+    bot.start_bot()

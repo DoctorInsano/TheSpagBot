@@ -9,63 +9,18 @@ class Settings:
     
     def __init__(self, bot):
         try:
-            # Try to load the file using json.
-            # And pass the data to the Bot class instance if this succeeds.
-            with open(Settings.PATH, "r") as f:
-                settings = f.read()
-                data = json.loads(settings)
-                # "BannedWords" is only a key in the settings in older versions.
-                # We moved to a separate file for blacklisted words.
-                if "BannedWords" in data:
-                    logger.info("Updating Blacklist system to new version...")
-                    try:
-                        with open("blacklist.txt", "r+") as f:
-                            logger.info("Moving Banned Words to the blacklist.txt file...")
-                            # Read the data, and split by word or phrase, then add BannedWords
-                            banned_list = f.read().split("\n") + data["BannedWords"]
-                            # Remove duplicates and sort by length, longest to shortest
-                            banned_list = sorted(list(set(banned_list)), key=lambda x: len(x), reverse=True)
-                            # Clear file, and then write in the new data
-                            f.seek(0)
-                            f.truncate(0)
-                            f.write("\n".join(banned_list))
-                            logger.info("Moved Banned Words to the blacklist.txt file.")
-                    
-                    except FileNotFoundError:
-                        with open("blacklist.txt", "w") as f:
-                            logger.info("Moving Banned Words to a new blacklist.txt file...")
-                            # Remove duplicates and sort by length, longest to shortest
-                            banned_list = sorted(list(set(data["BannedWords"])), key=lambda x: len(x), reverse=True)
-                            f.write("\n".join(banned_list))
-                            logger.info("Moved Banned Words to a new blacklist.txt file.")
-                    
-                    # Remove BannedWords list from data dictionary, and then write it to the settings file
-                    del data["BannedWords"]
-
-                    with open(Settings.PATH, "w") as f:
-                        f.write(json.dumps(data, indent=4, separators=(",", ": ")))
-                    
-                    logger.info("Updated Blacklist system to new version.")
-
-                # Automatically update the settings.txt to the new version.
-                if "HelpMessageTimer" not in data or "AutomaticGenerationTimer" not in data:
-                    data["HelpMessageTimer"] = data.get("HelpMessageTimer", 7200) # Default is once per 2 hours
-                    data["AutomaticGenerationTimer"] = data.get("AutomaticGenerationTimer", -1) # Default is never: -1
-                    
-                    with open(Settings.PATH, "w") as f:
-                        f.write(json.dumps(data, indent=4, separators=(",", ": ")))
-
-                bot.set_settings(data["Host"],
-                                data["Port"],
-                                data["Channel"],
-                                data["Nickname"],
-                                data["Authentication"],
-                                data["DeniedUsers"],
-                                data["Cooldown"],
-                                data["KeyLength"],
-                                data["MaxSentenceWordAmount"],
-                                data["HelpMessageTimer"],
-                                data["AutomaticGenerationTimer"])
+            data = self.__read_settings()
+            self.host = data["Host"]
+            self.port = data["Port"]
+            self.channel = data["Channel"]
+            self.nickname = data["Nickname"]
+            self.authentication = data["Authentication"]
+            self.denied_users = data["DeniedUsers"]
+            self.cooldown = data["Cooldown"]
+            self.key_length = data["KeyLength"]
+            self.max_sentence_length = data["MaxSentenceWordAmount"]
+            self.help_message_timer = data["HelpMessageTimer"]
+            self.automatic_generation_timer = data["AutomaticGenerationTimer"]
 
         except ValueError:
             logger.error("Error in settings file.")
@@ -75,6 +30,53 @@ class Settings:
             Settings.write_default_settings_file()
             raise ValueError("Please fix your settings.txt file that was just generated.")
     
+    def __read_settings(self):
+        # Try to load the file using json.
+        with open(Settings.PATH, "r") as f:
+            settings = f.read()
+            data = json.loads(settings)
+            # "BannedWords" is only a key in the settings in older versions.
+            # We moved to a separate file for blacklisted words.
+            if "BannedWords" in data:
+                logger.info("Updating Blacklist system to new version...")
+                try:
+                    with open("blacklist.txt", "r+") as f:
+                        logger.info("Moving Banned Words to the blacklist.txt file...")
+                        # Read the data, and split by word or phrase, then add BannedWords
+                        banned_list = f.read().split("\n") + data["BannedWords"]
+                        # Remove duplicates and sort by length, longest to shortest
+                        banned_list = sorted(list(set(banned_list)), key=lambda x: len(x), reverse=True)
+                        # Clear file, and then write in the new data
+                        f.seek(0)
+                        f.truncate(0)
+                        f.write("\n".join(banned_list))
+                        logger.info("Moved Banned Words to the blacklist.txt file.")
+                
+                except FileNotFoundError:
+                    with open("blacklist.txt", "w") as f:
+                        logger.info("Moving Banned Words to a new blacklist.txt file...")
+                        # Remove duplicates and sort by length, longest to shortest
+                        banned_list = sorted(list(set(data["BannedWords"])), key=lambda x: len(x), reverse=True)
+                        f.write("\n".join(banned_list))
+                        logger.info("Moved Banned Words to a new blacklist.txt file.")
+                
+                # Remove BannedWords list from data dictionary, and then write it to the settings file
+                del data["BannedWords"]
+
+                with open(Settings.PATH, "w") as f:
+                    f.write(json.dumps(data, indent=4, separators=(",", ": ")))
+                
+                logger.info("Updated Blacklist system to new version.")
+
+            # Automatically update the settings.txt to the new version.
+            if "HelpMessageTimer" not in data or "AutomaticGenerationTimer" not in data:
+                data["HelpMessageTimer"] = data.get("HelpMessageTimer", 7200) # Default is once per 2 hours
+                data["AutomaticGenerationTimer"] = data.get("AutomaticGenerationTimer", -1) # Default is never: -1
+                
+                with open(Settings.PATH, "w") as f:
+                    f.write(json.dumps(data, indent=4, separators=(",", ": ")))
+        return data
+
     @staticmethod
     def write_default_settings_file():
         # If the file is missing, create a standardised settings.txt file
