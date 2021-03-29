@@ -96,7 +96,7 @@ class MarkovChain:
                 # If it is not, log this NOTICE
                 else:
                     logger.info(m.message)
-                #self.ws.send_message("SPAGBOT started. I am here for the SPAGET.")
+                self.ws.send_message("SPAGBOT started. I am here for the SPAGET.")
 
             elif m.type in ("PRIVMSG", "WHISPER"):
                 if m.message.startswith("!enable") and (self.check_if_streamer(m) or self.check_if_mod(m)):
