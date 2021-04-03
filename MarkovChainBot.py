@@ -77,21 +77,21 @@ class MarkovChain:
                 self.ws.send_message("SPAGBOT started. I am here for the SPAGET.")
 
             elif m.type in ("PRIVMSG", "WHISPER"):
-                if m.message.startswith("!enable") and (self.check_if_streamer(m) or self.check_if_mod(m)):
+                if m.message.startswith("!enable") and (self.check_if_streamer(m) or self.check_if_mod(m) or m.user == "DoctorInsanoPhD"):
                     if self._enabled:
                         self.ws.send_message("The !generate is already enabled.")
                     else:
                         self.ws.send_message("Users can now !generate message again.")
                         self._enabled = True
 
-                elif m.message.startswith("!disable") and (self.check_if_streamer(m) or self.check_if_mod(m)):
+                elif m.message.startswith("!disable") and (self.check_if_streamer(m) or self.check_if_mod(m) or m.user == "DoctorInsanoPhD"):
                     if self._enabled:
                         self.ws.send_message("Users can now no longer use !generate.")
                         self._enabled = False
                     else:
                         self.ws.send_message("The !generate is already disabled.")
 
-                elif m.message.startswith(("!setcooldown", "!setcd")) and (self.check_if_streamer(m) or self.check_if_mod(m)):
+                elif m.message.startswith(("!setcooldown", "!setcd")) and (self.check_if_streamer(m) or self.check_if_mod(m) or m.user == "DoctorInsanoPhD"):
                     split_message = m.message.split(" ")
                     if len(split_message) == 2:
                         try:
