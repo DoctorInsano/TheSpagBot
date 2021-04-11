@@ -198,11 +198,6 @@ class MarkovChain:
                             if len(key) < self.settings.key_length:
                                 key.append(word)
                                 continue
-                            
-                            if not self.db.add_rule_queue(key + [word]):
-                                logger.warning(f"Failed to add rule. Message that caused failure: {m.message}")
-                                return
-                            
                             # Remove the first word, and add the current word,
                             # so that the key is correct for the next word.
                             key.pop(0)
