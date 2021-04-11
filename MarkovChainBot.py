@@ -180,7 +180,9 @@ class MarkovChain:
                     for sentence in sentences:
                         # Get all seperate words
                         words = sentence.split(" ")
-                        
+                        if "" in words:
+                            words.remove("") #double spaces will lead to invalid rules
+                            
                         # If the sentence is too short, ignore it and move on to the next.
                         if len(words) <= self.settings.key_length:
                             continue
