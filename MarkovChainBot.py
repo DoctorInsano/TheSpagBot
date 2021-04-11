@@ -9,7 +9,7 @@ import threading, socket, time, logging, re, string
 from Settings import Settings
 from Database import Database
 from Timer import LoopingTimer
-
+import random
 logger = logging.getLogger(__name__)
 
 class MarkovChain:
@@ -61,7 +61,9 @@ class MarkovChain:
                 # Get the list of mods used for modifying the blacklist
                 logger.info("Fetching mod list...")
                 self.ws.send_message("/mods")
-
+                if (self.settings.startup_messages):
+                    self.ws.send_message(random.choice(self.settings.startup_messages))
+                
             elif m.type == "NOTICE":
                 # Check whether the NOTICE is a response to our /mods request
                 if m.message.startswith("The moderators of this channel are:"):
@@ -74,8 +76,7 @@ class MarkovChain:
                 # If it is not, log this NOTICE
                 else:
                     logger.info(m.message)
-                self.ws.send_message("SPAGBOT started. I am here for the SPAGET.")
-
+                    
             elif m.type in ("PRIVMSG", "WHISPER"):
                 if m.message.startswith("!enable") and (self.check_if_streamer(m) or self.check_if_mod(m) or m.user == "DoctorInsanoPhD"):
                     if self._enabled:
@@ -196,7 +197,9 @@ class MarkovChain:
                                 key.append(word)
                                 continue
                             
-                            self.db.add_rule_queue(key + [word])
+                            if not self.db.add_rule_queue(key + [word]):
+                                logger.warning(f"Failed to add rule. Message that caused failure: {m.message}")
+                                return
                             
                             # Remove the first word, and add the current word,
                             # so that the key is correct for the next word.

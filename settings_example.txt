@@ -14,5 +14,11 @@
     "KeyLength": 2,
     "MaxSentenceWordAmount": 30,
     "HelpMessageTimer": 7200,
-    "AutomaticGenerationTimer": 300
+    "AutomaticGenerationTimer": 300,
+	"StartupMessages": [
+		"Message 1.",
+		"Message 2.",
+		"Message 3.",
+		"Message 4."
+	]
 }

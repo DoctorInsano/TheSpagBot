@@ -21,6 +21,7 @@ class Settings:
             self.max_sentence_length = data["MaxSentenceWordAmount"]
             self.help_message_timer = data["HelpMessageTimer"]
             self.automatic_generation_timer = data["AutomaticGenerationTimer"]
+            self.startup_messages = data["StartupMessages"]
 
         except ValueError:
             logger.error("Error in settings file.")
