@@ -181,7 +181,7 @@ class MarkovChain:
                         # Get all seperate words
                         words = sentence.split(" ")
                         if "" in words:
-                            words = filter(lambda x: x != "", words) #double spaces will lead to invalid rules
+                            words = list(filter(lambda x: x != "", words)) #double spaces will lead to invalid rules
                             
                         # If the sentence is too short, ignore it and move on to the next.
                         if len(words) <= self.settings.key_length:
