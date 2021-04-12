@@ -10,7 +10,6 @@ from Settings import Settings
 from Database import Database
 from Timer import LoopingTimer
 import random
-import functools
 logger = logging.getLogger(__name__)
 
 class MarkovChain:
