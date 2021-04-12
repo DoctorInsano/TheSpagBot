@@ -10,6 +10,7 @@ from Settings import Settings
 from Database import Database
 from Timer import LoopingTimer
 import random
+import functools
 logger = logging.getLogger(__name__)
 
 class MarkovChain:
@@ -181,7 +182,7 @@ class MarkovChain:
                         # Get all seperate words
                         words = sentence.split(" ")
                         if "" in words:
-                            words.remove("") #double spaces will lead to invalid rules
+                            words = filter(lambda x: x != "", words) #double spaces will lead to invalid rules
                             
                         # If the sentence is too short, ignore it and move on to the next.
                         if len(words) <= self.settings.key_length:
