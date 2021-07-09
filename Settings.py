@@ -22,6 +22,7 @@ class Settings:
             self.help_message_timer = data["HelpMessageTimer"]
             self.automatic_generation_timer = data["AutomaticGenerationTimer"]
             self.startup_messages = data["StartupMessages"]
+            self.minimum_sentence_length = data["MinimumSentenceLength"]
 
         except ValueError:
             logger.error("Error in settings file.")
@@ -94,7 +95,8 @@ class Settings:
                                 "KeyLength": 2,
                                 "MaxSentenceWordAmount": 25,
                                 "HelpMessageTimer": 7200,
-                                "AutomaticGenerationTimer": -1
+                                "AutomaticGenerationTimer": -1,
+                                "MinimumSentenceLength" : 2
                             }
             f.write(json.dumps(standard_dict, indent=4, separators=(",", ": ")))
 

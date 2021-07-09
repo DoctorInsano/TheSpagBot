@@ -318,15 +318,15 @@ class MarkovChain:
                 word = self.db.get_next(i, key)
 
             # Return if next word is the END
-            if word == "<END>" or word == None:
+            if word in ["<END>", None] and len(sentence) >= self.settings.minimum_sentence_length:
                 break
 
-            # Otherwise add the word
-            sentence.append(word)
-            
-            # Modify the key so on the next iteration it gets the next item
-            key.pop(0)
-            key.append(word)
+            if word not in ["<END>", None]:
+                # Otherwise add the word
+                sentence.append(word)                
+                # Modify the key so on the next iteration it gets the next item
+                key.pop(0)
+                key.append(word)
         
         # If there were params, but the sentence resulting is identical to the params
         # Then the params did not result in an actual sentence
