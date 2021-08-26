@@ -324,15 +324,12 @@ class MarkovChain:
                 return "There is not enough learned information yet.", False
 
         attempts = 0
-        print(key, sentence)
         while len(sentence) < self.settings.minimum_sentence_length and attempts < 10:
             generated_sentence = self.generate_sentence(key[:])
             if not generated_sentence:
                 key = self.db.get_start()
-                print(key)
             else:
                 sentence += generated_sentence
-            print(sentence, attempts)
             attempts += 1
 
         # If there were params, but the sentence resulting is identical to the params
