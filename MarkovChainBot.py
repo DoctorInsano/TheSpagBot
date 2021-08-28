@@ -287,6 +287,13 @@ class MarkovChain:
             logger.exception(e)
 
     def generate(self, params) -> "Tuple[str, bool]":
+        if "pineapple" in params:
+            return (random.choice([
+                "Pineapple belongs on pizza.",
+                "Pineapple!? My favorite pizza topping!",
+                "Pineapple? On pizza!? Yes, please.",
+                "Pizza? Only if it has pineapple on it."
+            ]), True)
 
         # Check for commands or recursion, eg: !generate !generate
         if len(params) > 0:
