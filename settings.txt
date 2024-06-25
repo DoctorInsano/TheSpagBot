@@ -1,0 +1,25 @@
+{
+    "Host": "irc.chat.twitch.tv",
+    "Port": 6667,
+    "Channel": "#xTwoShoes",
+    "Nickname": "TheSpagBot",
+    "Authentication": "",
+    "DeniedUsers": [
+        "StreamElements",
+        "Nightbot",
+        "Moobot",
+        "Marbiebot",
+		"StreamLabs"
+    ],
+    "Cooldown": 5,
+    "KeyLength": 2,
+    "MaxSentenceWordAmount": 25,
+    "HelpMessageTimer": 1800,
+    "AutomaticGenerationTimer": 300,
+	"StartupMessages": [
+		"SPAGBOT started. I am here for the SPAGET.",
+		"Moretti Spaghetti's number one fan has arrived. I anticipate the great regretti.",
+		"SPAGBOT is here to build research tables!",
+		"SPAGBOT is here! I can't stop running!"
+	]
+}

@@ -15,14 +15,15 @@ class Settings:
             self.channel = data["Channel"]
             self.nickname = data["Nickname"]
             self.authentication = data["Authentication"]
-            self.denied_users = data["DeniedUsers"]
-            self.cooldown = data["Cooldown"]
-            self.key_length = data["KeyLength"]
-            self.max_sentence_length = data["MaxSentenceWordAmount"]
-            self.help_message_timer = data["HelpMessageTimer"]
-            self.automatic_generation_timer = data["AutomaticGenerationTimer"]
-            self.startup_messages = data["StartupMessages"]
-            self.minimum_sentence_length = data["MinimumSentenceLength"]
+            self.denied_users = data.get("DeniedUsers", [])
+            self.cooldown = data.get("Cooldown", 20)
+            self.key_length = data.get("KeyLength", 2)
+            self.max_sentence_length = data.get("MaxSentenceWordAmount", 25)
+            self.help_message_timer = data.get("HelpMessageTimer", 7200)
+            self.automatic_generation_timer = data.get("AutomaticGenerationTimer", -1)
+            self.startup_messages = data.get("StartupMessages", [])
+            self.minimum_sentence_length = data.get("MinimumSentenceLength", 2)
+            self.mods = data.get("Mods", [])
 
         except ValueError:
             logger.error("Error in settings file.")
@@ -96,7 +97,8 @@ class Settings:
                                 "MaxSentenceWordAmount": 25,
                                 "HelpMessageTimer": 7200,
                                 "AutomaticGenerationTimer": -1,
-                                "MinimumSentenceLength" : 2
+                                "MinimumSentenceLength" : 2,
+                                "Mods": "[]"
                             }
             f.write(json.dumps(standard_dict, indent=4, separators=(",", ": ")))
 

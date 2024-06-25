@@ -23,11 +23,11 @@ class MarkovChain:
         # Make a translation table for removing punctuation efficiently
         self.punct_trans_table = str.maketrans("", "", string.punctuation)
         # List of moderators used in blacklist modification, includes broadcaster
-        self.mod_list = []
         self.set_blacklist()
 
         # Fill previously initialised variables with data from the settings.txt file
         self.settings = Settings(self)
+        self.mod_list = self.settings.mods
         self.db = Database(self.settings.channel)
 
         # Set up daemon Timer to send help messages
@@ -63,23 +63,12 @@ class MarkovChain:
             if m.type == "366":
                 logger.info(f"Successfully joined channel: #{m.channel}")
                 # Get the list of mods used for modifying the blacklist
-                logger.info("Fetching mod list...")
-                self.ws.send_message("/mods")
+                logger.info(f'mods: {self.settings.mods}')
                 if (self.settings.startup_messages):
                     self.ws.send_message(random.choice(self.settings.startup_messages))
 
             elif m.type == "NOTICE":
-                # Check whether the NOTICE is a response to our /mods request
-                if m.message.startswith("The moderators of this channel are:"):
-                    string_list = m.message.replace("The moderators of this channel are:", "").strip()
-                    self.mod_list = [m.channel] + string_list.split(", ")
-                    logger.info(f"Fetched mod list. Found {len(self.mod_list) - 1} mods.")
-                elif m.message == "There are no moderators of this channel.":
-                    self.mod_list = [m.channel]
-                    logger.info(f"Fetched mod list. Found no mods.")
-                # If it is not, log this NOTICE
-                else:
-                    logger.info(m.message)
+                logger.info(m.message)
 
             elif m.type in ("PRIVMSG", "WHISPER"):
                 if m.message.startswith("!enable") and (
